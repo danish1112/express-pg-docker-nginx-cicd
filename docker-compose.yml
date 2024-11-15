@@ -2,13 +2,17 @@ version: '3.8'
 services:
   backend:
     build:
-      context: ./backend
-    ports:
-      - "3000:3000"
+      context: .
     env_file:
       - .env
+    volumes:
+      - .:/app
+    networks:
+      - app-network
     depends_on:
       - db
+    deploy:
+      replicas: 2
 
   db:
     image: postgres:15
@@ -18,6 +22,8 @@ services:
       POSTGRES_DB: crudapp
     ports:
       - "5432:5432"
+    networks:
+      - app-network
     volumes:
       - pgdata:/var/lib/postgresql/data
 
@@ -27,8 +33,14 @@ services:
       - "80:80"
     volumes:
       - ./nginx:/etc/nginx/conf.d
+    networks:
+      - app-network
     depends_on:
       - backend
 
 volumes:
   pgdata:
+
+networks:
+  app-network:
+    driver: bridge

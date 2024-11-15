@@ -6,7 +6,10 @@ const app = express();
 app.use(express.json());
 app.use('/users', usersRouter);
 
-app.get('/', (req, res) => res.send('Welcome to the CRUD App!'));
+app.get('/', (req, res) => {
+    console.log("hello11")
+    res.send('Welcome to the CRUD App')
+});
 
 // Health check endpoint
 app.get('/health', async (req, res) => {
