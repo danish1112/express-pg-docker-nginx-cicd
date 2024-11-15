@@ -21,11 +21,7 @@ jobs:
         DOCKER_USERNAME: ${{secrets.DOCKER_USERNAME}}
         DOCKER_PASSWORD: ${{secrets.DOCKER_PASSWORD}}
       run: echo "${DOCKER_PASSWORD}" | docker login -u "${DOCKER_USERNAME}" --password-stdin
-    - name: Build Docker images with Compose
-        run: |
-          docker-compose -f docker-compose.yml build  # Build images defined in docker-compose.yml
-
-    - name: Push Docker images to Docker Hub
-        run: |
-          # Push all images defined in the docker-compose.yml
-          docker-compose -f docker-compose.yml push
+    - name: Build the Docker image
+      run: docker build -t danishyousuf/backend-pipeline:latest .
+    - name: Push to dockerhub
+      run: docker push danishyousuf/backend-pipeline:latest
