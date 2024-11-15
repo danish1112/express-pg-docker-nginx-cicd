@@ -1,0 +1,27 @@
+name: CI/CD Pipeline for Dockerized CRUD App
+
+on:
+  push:
+    branches:
+      - main  # Trigger this on push to the 'main' branch
+  pull_request:
+    branches:
+      - main  # Trigger on pull requests to 'main' branch
+
+jobs:
+  # Push updated backend image to Docker Hub
+  build:
+    runs-on: ubuntu-latest
+
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Login Dockerhub
+      env: 
+        DOCKER_USERNAME: ${{secrets.DOCKER_USERNAME}}
+        DOCKER_PASSWORD: ${{secrets.DOCKER_PASSWORD}}
+      run: echo "${DOCKER_PASSWORD}" | docker login -u "${DOCKER_USERNAME}" --password-stdin
+    - name: Build the Docker image
+      run: docker build -t danishyousuf/backend-pipeline:latest .
+    - name: Push to dockerhub
+      run: docker push danishyousuf/backend-pipeline:latest
