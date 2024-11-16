@@ -4,6 +4,7 @@ services:
     build:
       context: .
     image: danishyousuf/backend-pipeline
+    platform: linux/amd64
     env_file:
       - .env
     volumes:

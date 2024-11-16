@@ -67,6 +67,9 @@ jobs:
       - name: Pull Docker images
         run: sudo docker compose -f docker-compose.yml pull
 
+      - name: down Docker images
+        run: sudo docker compose -f docker-compose.yml down  
+
       # Step 6: Remove old containers using docker compose (V2)
       - name: Remove old containers
         run: sudo docker compose -f docker-compose.yml down --remove-orphans || true
