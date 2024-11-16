@@ -28,3 +28,20 @@ jobs:
       run: docker compose -f docker-compose.yml build 
     - name: Push to dockerhub
       run: docker compose -f docker-compose.yml push
+
+  deploy:
+
+    runs-on: self-hosted
+
+    steps:
+    # Step 1: Pull Docker images using docker compose (V2)
+    - name: Pull Docker images
+      run: sudo docker compose -f docker-compose.yml pull
+
+    # Step 2: Remove old containers using docker compose (V2)
+    - name: Remove old containers
+      run: sudo docker compose -f docker-compose.yml down --remove-orphans || true
+
+    # Step 3: Build and run containers using docker compose (V2)
+    - name: Build and run Docker containers
+      run: sudo docker compose -f docker-compose.yml up -d --build
