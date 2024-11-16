@@ -159,5 +159,3 @@ Store sensitive values in GitHub Secrets:
 - Set up monitoring and logging for containers.  
 
 ---
-
-Feel free to customize this further based on your requirements! 😊
