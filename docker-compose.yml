@@ -3,6 +3,7 @@ services:
   backend:
     build:
       context: .
+    image: danishyousuf/backend-pipeline
     env_file:
       - .env
     volumes:
