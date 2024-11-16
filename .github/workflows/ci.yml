@@ -73,4 +73,4 @@ jobs:
 
       # Step 7: Build and run containers using docker compose (V2)
       - name: Build and run Docker containers
-        run: sudo docker compose -f docker-compose.yml up -d --build
+        run: sudo docker compose -f docker-compose.yml up -d
