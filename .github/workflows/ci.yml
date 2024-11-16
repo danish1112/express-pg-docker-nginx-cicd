@@ -47,32 +47,30 @@ jobs:
     needs: build  # Ensure that the build job runs before deploy
 
     steps:
-    # Step 1: Checkout repository again (to ensure that docker-compose.yml is present)
-    - name: Checkout repository
-      uses: actions/checkout@v4
+      # Step 1: Checkout repository again (to ensure that docker-compose.yml is present)
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-    # Step 2: Download the .env file artifact
-    - name: Download .env file
-      uses: actions/download-artifact@v3
-      with:
-        name: env-file
+      # Step 2: Create .env file explicitly (instead of downloading from artifact)
+      - name: Generate .env file
+        run: echo -e "DB_USER=postgres\nDB_PASSWORD=postgres\nDB_NAME=crudapp\nDB_HOST=db\nDB_PORT=5432" > .env
 
-    # Debugging Step: Check if .env file is downloaded
-    - name: Verify .env file download (for debugging)
-      run: cat .env  # This will print the contents of the .env file after download
+      # Step 3: Verify .env file
+      - name: Verify .env file creation
+        run: cat .env  # This will print the contents of the .env file
 
-    # Step 3: Verify current working directory (debugging)
-    - name: List files in the directory
-      run: ls -la
+      # Step 4: Verify current working directory
+      - name: List files in the directory
+        run: ls -la
 
-    # Step 4: Pull Docker images using docker compose (V2)
-    - name: Pull Docker images
-      run: sudo docker compose -f docker-compose.yml pull
+      # Step 5: Pull Docker images using docker compose (V2)
+      - name: Pull Docker images
+        run: sudo docker compose -f docker-compose.yml pull
 
-    # Step 5: Remove old containers using docker compose (V2)
-    - name: Remove old containers
-      run: sudo docker compose -f docker-compose.yml down --remove-orphans || true
+      # Step 6: Remove old containers using docker compose (V2)
+      - name: Remove old containers
+        run: sudo docker compose -f docker-compose.yml down --remove-orphans || true
 
-    # Step 6: Build and run containers using docker compose (V2)
-    - name: Build and run Docker containers
-      run: sudo docker compose -f docker-compose.yml up -d --build
+      # Step 7: Build and run containers using docker compose (V2)
+      - name: Build and run Docker containers
+        run: sudo docker compose -f docker-compose.yml up -d --build
