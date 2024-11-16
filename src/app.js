@@ -8,7 +8,7 @@ app.use('/users', usersRouter);
 
 app.get('/', (req, res) => {
     console.log("hello");
-    res.send('Welcome to the CRUD App!!!')
+    res.send('Welcome to the CRUD App')
 });
 
 // Health check endpoint
