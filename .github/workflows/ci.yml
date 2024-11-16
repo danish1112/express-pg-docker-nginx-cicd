@@ -17,7 +17,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Generate .env file
-        run: |
+        run: 
           echo "DB_USER=postgres" > .env
           echo "DB_PASSWORD=postgres" >> .env
           echo "DB_NAME=crudapp" >> .env
