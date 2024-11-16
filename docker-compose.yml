@@ -9,6 +9,7 @@ services:
       - .env
     volumes:
       - .:/app
+      - /app/node_modules # To avoid overwriting node_modules in the container
     networks:
       - app-network
     depends_on:
