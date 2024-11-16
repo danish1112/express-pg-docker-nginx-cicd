@@ -59,15 +59,15 @@ jobs:
     needs: build  # Ensure that the build job runs before deploy
 
     steps:
-    # Step 1: Download the .env file artifact
-    - name: Download .env file
-      uses: actions/download-artifact@v3
-      with:
-        name: env-file
+    # # Step 1: Download the .env file artifact
+    # - name: Download .env file
+    #   uses: actions/download-artifact@v3
+    #   with:
+    #     name: env-file
 
-    # Debugging Step: Check if .env file is downloaded
-    - name: Verify .env file download (for debugging)
-      run: cat .env  # This will print the contents of the .env file after download
+    # # Debugging Step: Check if .env file is downloaded
+    # - name: Verify .env file download (for debugging)
+    #   run: cat .env  # This will print the contents of the .env file after download
 
     # Step 2: Pull Docker images using docker compose (V2)
     - name: Pull Docker images
