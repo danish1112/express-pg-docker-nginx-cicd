@@ -18,6 +18,7 @@ jobs:
     - uses: actions/checkout@v4
     - name: Install Docker Compose
       run: sudo apt-get update
+    - name : install
       run:  sudo apt-get install -y docker-compose  # Install Docker Compose
 
     - name: Login Dockerhub
