@@ -9,70 +9,75 @@ on:
       - main  # Trigger on pull requests to 'main' branch
 
 jobs:
+  # Push updated backend image to Docker Hub
   build:
     runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v4
-
+    
+    # Generate .env file for the build
     - name: Generate .env file
       run: echo -e "DB_USER=postgres\nDB_PASSWORD=postgres\nDB_NAME=crudapp\nDB_HOST=db\nDB_PORT=5432" > .env
 
-    - name: Verify current working directory
-      run: pwd  # Print the current directory to verify where you are
+    # Check current directory and list files for debugging
+    - name: Check working directory and files
+      run: |
+        echo "Checking the current working directory..."
+        pwd
+        echo "Listing files in the current directory..."
+        ls -la
 
-    - name: List files in the directory
-      run: ls -la  # List all files to ensure .env is created
+    # Login to Docker Hub
+    - name: Login to Docker Hub
+      env:
+        DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+        DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+      run: echo "${DOCKER_PASSWORD}" | docker login -u "${DOCKER_USERNAME}" --password-stdin
 
+    # Build the Docker image
+    - name: Build Docker image
+      run: docker compose -f docker-compose.yml build 
+
+    # Push the image to Docker Hub
+    - name: Push Docker image to Docker Hub
+      run: docker compose -f docker-compose.yml push
+
+    # Upload the .env file as an artifact for use in the deploy step
     - name: Upload .env file as artifact
       uses: actions/upload-artifact@v3
       with:
         name: env-file
         path: .env
-
-    - name: Login Dockerhub
-      env: 
-        DOCKER_USERNAME: ${{secrets.DOCKER_USERNAME}}
-        DOCKER_PASSWORD: ${{secrets.DOCKER_PASSWORD}}
-      run: echo "${DOCKER_PASSWORD}" | docker login -u "${DOCKER_USERNAME}" --password-stdin
-
-    - name: Build the Docker image
-      run: docker compose -f docker-compose.yml build 
-
-    - name: Push to dockerhub
-      run: docker compose -f docker-compose.yml push
+        if-no-files-found: warn  # Will not fail if the .env file is not found
+        include-hidden-files: false
 
   deploy:
     runs-on: self-hosted
-    needs: build  # Ensure that the build job runs before deploy
 
     steps:
-    # Step 1: Checkout repository again (to ensure that docker-compose.yml is present)
-    - name: Checkout repository
-      uses: actions/checkout@v4
-
-    # Step 2: Download the .env file artifact
-    - name: Download .env file
+    # Step 1: Download the .env file artifact from the build job
+    - name: Download .env file artifact
       uses: actions/download-artifact@v3
       with:
         name: env-file
 
-    # Debugging Step: Check if .env file is downloaded
-    - name: Verify .env file download (for debugging)
-      run: cat .env  # This will print the contents of the .env file after download
+    # Check working directory and list files for debugging
+    - name: Check working directory and files
+      run: |
+        echo "Checking the current working directory..."
+        pwd
+        echo "Listing files in the current directory..."
+        ls -la
 
-    # Step 3: Verify current working directory (debugging)
-    - name: List files in the directory
-      run: ls -la
-
-    # Step 4: Pull Docker images using docker compose (V2)
+    # Step 2: Pull Docker images using docker compose (V2)
     - name: Pull Docker images
       run: sudo docker compose -f docker-compose.yml pull
 
-    # Step 5: Remove old containers using docker compose (V2)
+    # Step 3: Remove old containers using docker compose (V2)
     - name: Remove old containers
       run: sudo docker compose -f docker-compose.yml down --remove-orphans || true
 
-    # Step 6: Build and run containers using docker compose (V2)
+    # Step 4: Build and run containers using docker compose (V2)
     - name: Build and run Docker containers
       run: sudo docker compose -f docker-compose.yml up -d --build
