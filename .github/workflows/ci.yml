@@ -15,8 +15,13 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+
     - name: Generate .env file
       run: echo -e "DB_USER=postgres\nDB_PASSWORD=postgres\nDB_NAME=crudapp\nDB_HOST=db\nDB_PORT=5432" > .env
+
+    - name: Verify .env file creation (for debugging)
+      run: cat .env  # This will print the contents of the .env file
+
     - name: Upload .env file as artifact
       uses: actions/upload-artifact@v3
       with:
@@ -28,8 +33,10 @@ jobs:
         DOCKER_USERNAME: ${{secrets.DOCKER_USERNAME}}
         DOCKER_PASSWORD: ${{secrets.DOCKER_PASSWORD}}
       run: echo "${DOCKER_PASSWORD}" | docker login -u "${DOCKER_USERNAME}" --password-stdin
+
     - name: Build the Docker image
       run: docker compose -f docker-compose.yml build 
+
     - name: Push to dockerhub
       run: docker compose -f docker-compose.yml push
 
@@ -43,6 +50,10 @@ jobs:
       uses: actions/download-artifact@v3
       with:
         name: env-file
+
+    # Debugging Step: Check if .env file is downloaded
+    - name: Verify .env file download (for debugging)
+      run: cat .env  # This will print the contents of the .env file after download
 
     # Step 2: Pull Docker images using docker compose (V2)
     - name: Pull Docker images
