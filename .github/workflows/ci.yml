@@ -69,6 +69,14 @@ jobs:
     # - name: Verify .env file download (for debugging)
     #   run: cat .env  # This will print the contents of the .env file after download
 
+     # Step 1: Checkout repository again (to ensure that docker-compose.yml is present)
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    # Step 3: Verify current working directory (debugging)
+    - name: List files in the directory
+      run: ls -la
+      
     # Step 2: Pull Docker images using docker compose (V2)
     - name: Pull Docker images
       run: sudo docker compose -f docker-compose.yml pull
