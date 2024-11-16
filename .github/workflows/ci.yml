@@ -9,7 +9,6 @@ on:
       - main  # Trigger on pull requests to 'main' branch
 
 jobs:
-  # Push updated backend image to Docker Hub
   build:
     runs-on: ubuntu-latest
 
@@ -17,8 +16,7 @@ jobs:
     - uses: actions/checkout@v4
 
     - name: Generate .env file
-      run: |
-        echo -e "DB_USER=postgres\nDB_PASSWORD=postgres\nDB_NAME=crudapp\nDB_HOST=db\nDB_PORT=5432" > .env
+      run: echo -e "DB_USER=postgres\nDB_PASSWORD=postgres\nDB_NAME=crudapp\nDB_HOST=db\nDB_PORT=5432" > .env
 
     - name: Verify current working directory
       run: pwd  # Print the current directory to verify where you are
@@ -26,21 +24,11 @@ jobs:
     - name: List files in the directory
       run: ls -la  # List all files to ensure .env is created
 
-    # Verify that .env exists before uploading
-    - name: Check if .env file exists
-      run: |
-        if [ -f ".env" ]; then
-          echo ".env file exists."
-        else
-          echo ".env file does not exist."
-          exit 1
-        fi
-
     - name: Upload .env file as artifact
       uses: actions/upload-artifact@v3
       with:
         name: env-file
-        path: .env  # Upload .env file from the current directory
+        path: .env
 
     - name: Login Dockerhub
       env: 
@@ -59,32 +47,32 @@ jobs:
     needs: build  # Ensure that the build job runs before deploy
 
     steps:
-    # # Step 1: Download the .env file artifact
-    # - name: Download .env file
-    #   uses: actions/download-artifact@v3
-    #   with:
-    #     name: env-file
-
-    # # Debugging Step: Check if .env file is downloaded
-    # - name: Verify .env file download (for debugging)
-    #   run: cat .env  # This will print the contents of the .env file after download
-
-     # Step 1: Checkout repository again (to ensure that docker-compose.yml is present)
+    # Step 1: Checkout repository again (to ensure that docker-compose.yml is present)
     - name: Checkout repository
       uses: actions/checkout@v4
+
+    # Step 2: Download the .env file artifact
+    - name: Download .env file
+      uses: actions/download-artifact@v3
+      with:
+        name: env-file
+
+    # Debugging Step: Check if .env file is downloaded
+    - name: Verify .env file download (for debugging)
+      run: cat .env  # This will print the contents of the .env file after download
 
     # Step 3: Verify current working directory (debugging)
     - name: List files in the directory
       run: ls -la
-      
-    # Step 2: Pull Docker images using docker compose (V2)
+
+    # Step 4: Pull Docker images using docker compose (V2)
     - name: Pull Docker images
       run: sudo docker compose -f docker-compose.yml pull
 
-    # Step 3: Remove old containers using docker compose (V2)
+    # Step 5: Remove old containers using docker compose (V2)
     - name: Remove old containers
       run: sudo docker compose -f docker-compose.yml down --remove-orphans || true
 
-    # Step 4: Build and run containers using docker compose (V2)
+    # Step 6: Build and run containers using docker compose (V2)
     - name: Build and run Docker containers
       run: sudo docker compose -f docker-compose.yml up -d --build
